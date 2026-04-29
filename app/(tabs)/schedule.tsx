@@ -4,6 +4,7 @@ import { useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { events } from '../data/events';
 import { Ionicons } from '@expo/vector-icons';
+import { colors } from '../theme/colors';
 
 export default function ScheduleScreen() {
   const [myPlan, setMyPlan] = useState<string[]>([]);
@@ -47,14 +48,14 @@ export default function ScheduleScreen() {
         return (
           <View key={event.id} style={styles.card}>
             <View style={styles.row}>
-                <Ionicons name="time" size={16} color="#7fd1ff" />
+                <Ionicons name="time" size={16} color="{colors.seafoam}" />
                 <Text style={styles.time}>{event.time}</Text>
             </View>
 
             <Text style={styles.name}>{event.title}</Text>
 
             <View style={styles.row}>
-                <Ionicons name="location" size={16} color="#7fd1ff" />
+                <Ionicons name="location" size={16} color="{colors.seafoam}" />
                 <Text style={styles.location}>{event.location}</Text>
             </View>
 
@@ -77,45 +78,45 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#0c1b2a',
+    backgroundColor: colors.oceanDark,
   },
   title: {
-    color: '#fff',
+    color: colors.text,
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 20,
   },
   card: {
-    backgroundColor: '#13293d',
+    backgroundColor: colors.card,
     borderRadius: 16,
     padding: 18,
     marginBottom: 16,
   },
   time: {
-    color: '#7fd1ff',
+    color: colors.seafoam,
     fontWeight: 'bold',
   },
   name: {
-    color: '#fff',
+    color: colors.text,
     fontSize: 20,
     fontWeight: 'bold',
     marginTop: 5,
   },
   location: {
-    color: '#aaa',
+    color: colors.mutedText,
     marginTop: 5,
   },
   button: {
-    backgroundColor: '#1f6f8b',
+    backgroundColor: colors.lagoon,
     padding: 10,
     borderRadius: 8,
     marginTop: 12,
   },
   selectedButton: {
-    backgroundColor: '#2ecc71',
+    backgroundColor: colors.seafoam,
   },
   buttonText: {
-    color: '#fff',
+    color: colors.text,
     textAlign: 'center',
     fontWeight: 'bold',
   },
@@ -123,10 +124,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-  },
-    removeText: {
-    color: '#ff6b6b',
-    marginTop: 6,
-    fontSize: 13,
   },
 });
