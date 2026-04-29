@@ -4,6 +4,7 @@ import { useRouter , useFocusEffect} from "expo-router";
 import { useState, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
+import { colors } from '../theme/colors';
 
 
 
@@ -124,10 +125,12 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  
+
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#0c1b2a",
+    backgroundColor: colors.oceanDark,
   },
   header: {
     fontSize: 24,
@@ -140,7 +143,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   card: {
-    backgroundColor: "#13293d",
+    backgroundColor: colors.card,
     padding: 15,
     borderRadius: 12,
     marginBottom: 15,
@@ -156,7 +159,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   button: {
-    backgroundColor: "#1f6f8b",
+    backgroundColor: colors.lagoon,
     padding: 12,
     borderRadius: 8,
     marginTop: 10,
@@ -167,7 +170,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   planCard: {
-    backgroundColor: '#1b3a4b',
+    backgroundColor: colors.cardAlt,
     padding: 12,
     borderRadius: 10,
     marginBottom: 10,
@@ -178,7 +181,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   planTime: {
-    color: '#7fd1ff',
+    color: colors.seafoam,
     marginLeft: 4,
     marginTop: 0,
   },
@@ -189,7 +192,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   eyebrow: {
-    color: '#f4c542',
+    color: colors.sunshine,
     fontWeight: 'bold',
     marginBottom: 8,
     textTransform: 'uppercase',
@@ -210,7 +213,7 @@ const styles = StyleSheet.create({
 
   countdownPill: {
     alignSelf: 'flex-start',
-    backgroundColor: '#f4c542',
+    backgroundColor: colors.sunshine,
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 999,
@@ -222,7 +225,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   highlightCard: {
-  backgroundColor: '#1b3a4b',
+  backgroundColor: colors.cardAlt,
   padding: 14,
   borderRadius: 12,
   marginBottom: 10,
@@ -235,7 +238,7 @@ const styles = StyleSheet.create({
   },
 
   highlightTime: {
-    color: '#7fd1ff',
+    color: colors.seafoam,
     marginTop: 4,
   },
 
