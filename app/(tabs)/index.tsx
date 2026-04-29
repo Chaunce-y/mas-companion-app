@@ -1,26 +1,44 @@
 import { events } from '../data/events';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useRouter , useFocusEffect} from "expo-router";
+import { useState, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
 
 
 
 export default function HomeScreen() {
   const router = useRouter();
   const [myPlan, setMyPlan] = useState<string[]>([]);
-
-  useEffect(() => {
+  
+  useFocusEffect(
+  useCallback(() => {
     const loadPlan = async () => {
       const saved = await AsyncStorage.getItem("myPlan");
 
       if (saved) {
         setMyPlan(JSON.parse(saved));
+      } else {
+        setMyPlan([]);
       }
     };
 
     loadPlan();
-  }, []);
+  }, [])
+);
+  
+  const toggleEvent = async (id: string) => {
+    let updated: string[];
+
+    if (myPlan.includes(id)) {
+      updated = myPlan.filter((e) => e !== id);
+    } else {
+      updated = [...myPlan, id];
+    }
+
+    setMyPlan(updated);
+    await AsyncStorage.setItem('myPlan', JSON.stringify(updated));
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -65,8 +83,17 @@ export default function HomeScreen() {
 
             return (
               <View key={id} style={styles.planCard}>
-                <Text style={styles.planTitle}>{event?.title}</Text>
-                <Text style={styles.planTime}>{event?.time}</Text>
+                <View style={styles.planRow}>
+                  <Text style={styles.planTitle}>{event?.title}</Text>
+
+                  <View style={styles.row}>
+                    <Ionicons name="time" size={14} color="#7fd1ff" />
+                  <Text style={styles.planTime}>{event?.time}</Text>
+                </View>
+              </View>
+              <TouchableOpacity onPress={() => toggleEvent(id)}>
+                <Text style={styles.removeText}>Remove</Text>
+              </TouchableOpacity>
               </View>
               );
             })
@@ -140,21 +167,20 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   planCard: {
-  backgroundColor: '#1b3a4b',
-  padding: 12,
-  borderRadius: 10,
-  marginBottom: 10,
+    backgroundColor: '#1b3a4b',
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 10,
   },
-
   planTitle: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
   },
-
   planTime: {
     color: '#7fd1ff',
-    marginTop: 4,
+    marginLeft: 4,
+    marginTop: 0,
   },
   hero: {
     backgroundColor: '#123c4a',
@@ -162,7 +188,6 @@ const styles = StyleSheet.create({
     padding: 22,
     marginBottom: 20,
   },
-
   eyebrow: {
     color: '#f4c542',
     fontWeight: 'bold',
@@ -213,4 +238,19 @@ const styles = StyleSheet.create({
     color: '#7fd1ff',
     marginTop: 4,
   },
+
+  planRow: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+},
+row:{
+  flexDirection: 'row',
+  alignItems: 'center',
+},
+removeText: {
+  color: '#ff6b6b',
+  marginTop: 6,
+  fontSize: 13,
+},
 });

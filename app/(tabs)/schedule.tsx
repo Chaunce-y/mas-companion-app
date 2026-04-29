@@ -1,30 +1,28 @@
 import { ScrollView, Text, View, StyleSheet, TouchableOpacity } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useState, useCallback } from 'react';
+import { useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-type Event = {
-  id: string;
-  title: string;
-  time: string;
-  location: string;
-};
-
 import { events } from '../data/events';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ScheduleScreen() {
   const [myPlan, setMyPlan] = useState<string[]>([]);
 
-    useEffect(() => {
-    const loadPlan = async () => {
-        const saved = await AsyncStorage.getItem('myPlan');
+    useFocusEffect(
+        useCallback(() => {
+            const loadPlan = async () => {
+            const saved = await AsyncStorage.getItem('myPlan');
 
-        if (saved) {
-        setMyPlan(JSON.parse(saved));
-        }
-    };
+            if (saved) {
+                setMyPlan(JSON.parse(saved));
+            } else {
+                setMyPlan([]);
+            }
+            };
 
-    loadPlan();
-    }, []);
+            loadPlan();
+        }, [])
+        );
 
     const toggleEvent = async (id: string) => {
     let updated: string[];
@@ -48,9 +46,17 @@ export default function ScheduleScreen() {
 
         return (
           <View key={event.id} style={styles.card}>
-            <Text style={styles.time}>{event.time}</Text>
+            <View style={styles.row}>
+                <Ionicons name="time" size={16} color="#7fd1ff" />
+                <Text style={styles.time}>{event.time}</Text>
+            </View>
+
             <Text style={styles.name}>{event.title}</Text>
-            <Text style={styles.location}>{event.location}</Text>
+
+            <View style={styles.row}>
+                <Ionicons name="location" size={16} color="#7fd1ff" />
+                <Text style={styles.location}>{event.location}</Text>
+            </View>
 
             <TouchableOpacity
               style={[styles.button, isSelected && styles.selectedButton]}
@@ -112,5 +118,15 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
     fontWeight: 'bold',
+  },
+    row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+    removeText: {
+    color: '#ff6b6b',
+    marginTop: 6,
+    fontSize: 13,
   },
 });
