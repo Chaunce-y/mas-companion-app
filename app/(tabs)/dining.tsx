@@ -1,24 +1,32 @@
-import { ScrollView, Text, View, StyleSheet, TouchableOpacity } from 'react-native';
+import { ScrollView, Text, View, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 
 const restaurants = [
   {
-    name: 'Fins Dining',
+    id: 'fins',
+    name: 'Fins Dining Room',
     type: 'Included Dining',
     hours: '5:30 PM – 9:30 PM',
     description: 'Main dining room with island-inspired dinner service.',
+    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5',
   },
+
   {
+    id: 'frank-lolas',
     name: "Frank & Lola's Pizzeria",
     type: 'Casual Dining',
     hours: '11:00 AM – 11:00 PM',
     description: 'Pizza, quick bites, and late-night comfort food.',
+    image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591',
   },
+
   {
+    id: 'jwb',
     name: 'JWB Prime Steakhouse',
     type: 'Specialty Dining',
     hours: '6:00 PM – 10:00 PM',
-    description: 'Premium steakhouse experience for date night or celebrations.',
+    description: 'Upscale specialty steakhouse with prime steaks, seafood, and casual elegance.',
+    image: 'https://images.unsplash.com/photo-1544025162-d76694265947',
   },
 ];
 
@@ -34,6 +42,10 @@ export default function DiningScreen() {
     </View>
     {restaurants.map((restaurant) => (
         <View key={restaurant.name} style={styles.restaurantCard}>
+            <Image 
+            source={{ uri: restaurant.image }} 
+            style={styles.restaurantImage} 
+            />
             <View style={styles.row}>
             <Text style={styles.badge}>{restaurant.type}</Text>
             </View>
@@ -176,5 +188,12 @@ actionText: {
   color: '#fff',
   textAlign: 'center',
   fontWeight: 'bold',
+},
+
+restaurantImage: {
+  width: '100%',
+  height: 140,
+  borderRadius: 14,
+  marginBottom: 12,
 },
 });
