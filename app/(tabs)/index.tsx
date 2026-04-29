@@ -1,24 +1,77 @@
+import { events } from '../data/events';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+
+
 export default function HomeScreen() {
   const router = useRouter();
+  const [myPlan, setMyPlan] = useState<string[]>([]);
+
+  useEffect(() => {
+    const loadPlan = async () => {
+      const saved = await AsyncStorage.getItem("myPlan");
+
+      if (saved) {
+        setMyPlan(JSON.parse(saved));
+      }
+    };
+
+    loadPlan();
+  }, []);
+
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.header}>Welcome aboard, Chauncey</Text>
-      <Text style={styles.subheader}>Margaritaville at Sea Paradise</Text>
+      <View style={styles.hero}>
+        <Text style={styles.eyebrow}>Island Time Companion</Text>
+        <Text style={styles.heroTitle}>Welcome aboard, Chauncey</Text>
+        <Text style={styles.heroSubtitle}>Margaritaville at Sea Paradise</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Trip Countdown</Text>
-        <Text style={styles.cardText}>3 days until sailing</Text>
+        <View style={styles.countdownPill}>
+          <Text style={styles.countdownText}>3 days until sailing</Text>
+        </View>
       </View>
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Today's Highlights</Text>
-        <Text style={styles.cardText}>• Sail Away Party</Text>
-        <Text style={styles.cardText}>• Fins Dining Dinner</Text>
-        <Text style={styles.cardText}>• Comedy Show</Text>
-        <Text style={styles.cardText}>• Pool Party</Text>
+        <View style={styles.highlightCard}>
+          <Text style={styles.highlightTitle}>Sail Away Party</Text>
+          <Text style={styles.highlightTime}>4:00 PM • Pool Deck</Text>
+        </View>
+        <View style={styles.highlightCard}>
+          <Text style={styles.highlightTitle}>Fins Dining Dinner</Text>
+          <Text style={styles.highlightTime}>4:00 PM • Pool Deck</Text>
+        </View>
+        <View style={styles.highlightCard}>
+          <Text style={styles.highlightTitle}>Comedy Show</Text>
+          <Text style={styles.highlightTime}>7:30 PM • Main Theater</Text>
+        </View>
+        <View style={styles.highlightCard}>
+          <Text style={styles.highlightTitle}>Pool Party</Text>
+          <Text style={styles.highlightTime}>4:00 PM • Pool Deck</Text>
+        </View>
       </View>
+
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>My Plan</Text>
+
+          {myPlan.length === 0 ? (
+        <Text style={styles.cardText}>No events added yet</Text>
+        ) : (
+          myPlan.map((id) => {
+            const event = events.find((event) => event.id === id);
+
+            return (
+              <View key={id} style={styles.planCard}>
+                <Text style={styles.planTitle}>{event?.title}</Text>
+                <Text style={styles.planTime}>{event?.time}</Text>
+              </View>
+              );
+            })
+  )}
+</View>
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Quick Actions</Text>
@@ -85,5 +138,79 @@ const styles = StyleSheet.create({
     color: "#fff",
     textAlign: "center",
     fontWeight: "bold",
+  },
+  planCard: {
+  backgroundColor: '#1b3a4b',
+  padding: 12,
+  borderRadius: 10,
+  marginBottom: 10,
+  },
+
+  planTitle: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+
+  planTime: {
+    color: '#7fd1ff',
+    marginTop: 4,
+  },
+  hero: {
+    backgroundColor: '#123c4a',
+    borderRadius: 24,
+    padding: 22,
+    marginBottom: 20,
+  },
+
+  eyebrow: {
+    color: '#f4c542',
+    fontWeight: 'bold',
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+
+  heroTitle: {
+    color: '#fff',
+    fontSize: 30,
+    fontWeight: 'bold',
+  },
+
+  heroSubtitle: {
+    color: '#b8c7d9',
+    fontSize: 16,
+    marginTop: 6,
+  },
+
+  countdownPill: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#f4c542',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 999,
+    marginTop: 18,
+  },
+
+  countdownText: {
+    color: '#0c1b2a',
+    fontWeight: 'bold',
+  },
+  highlightCard: {
+  backgroundColor: '#1b3a4b',
+  padding: 14,
+  borderRadius: 12,
+  marginBottom: 10,
+  },
+
+  highlightTitle: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+
+  highlightTime: {
+    color: '#7fd1ff',
+    marginTop: 4,
   },
 });
