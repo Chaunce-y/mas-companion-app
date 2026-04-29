@@ -1,4 +1,4 @@
-import { ScrollView, Text, View, StyleSheet } from 'react-native';
+import { ScrollView, Text, View, StyleSheet, TouchableOpacity } from 'react-native';
 
 const restaurants = [
   {
@@ -24,19 +24,28 @@ const restaurants = [
 export default function DiningScreen() {
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Dining</Text>
-      <Text style={styles.subtitle}>
-        Explore restaurants, hours, and onboard dining options.
-      </Text>
+     <View style={styles.hero}>
+        <Text style={styles.eyebrow}>Onboard Dining</Text>
+        <Text style={styles.heroTitle}>Eat, drink, and cruise easy</Text>
+        <Text style={styles.heroSubtitle}>
+            Discover included dining, specialty restaurants, and late-night bites.
+        </Text>
+    </View>
+    {restaurants.map((restaurant) => (
+        <View key={restaurant.name} style={styles.restaurantCard}>
+            <View style={styles.row}>
+            <Text style={styles.badge}>{restaurant.type}</Text>
+            </View>
 
-      {restaurants.map((restaurant) => (
-        <View key={restaurant.name} style={styles.card}>
-          <Text style={styles.badge}>{restaurant.type}</Text>
-          <Text style={styles.name}>{restaurant.name}</Text>
-          <Text style={styles.hours}>{restaurant.hours}</Text>
-          <Text style={styles.description}>{restaurant.description}</Text>
+            <Text style={styles.restaurantName}>{restaurant.name}</Text>
+            <Text style={styles.hours}>{restaurant.hours}</Text>
+            <Text style={styles.description}>{restaurant.description}</Text>
+
+            <TouchableOpacity style={styles.actionButton}>
+            <Text style={styles.actionText}>View Menu</Text>
+            </TouchableOpacity>
         </View>
-      ))}
+        ))}
     </ScrollView>
   );
 }
@@ -89,4 +98,82 @@ const styles = StyleSheet.create({
     marginTop: 8,
     lineHeight: 20,
   },
+  hero: {
+    backgroundColor: '#123c4a',
+    borderRadius: 24,
+    padding: 22,
+    marginBottom: 20,
+  },
+
+  eyebrow: {
+    color: '#f4c542',
+    fontWeight: 'bold',
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+
+  heroTitle: {
+    color: '#fff',
+    fontSize: 30,
+    fontWeight: 'bold',
+  },
+
+  heroSubtitle: {
+    color: '#b8c7d9',
+    fontSize: 16,
+    marginTop: 6,
+  },
+  restaurantCard: {
+  backgroundColor: '#13293d',
+  borderRadius: 16,
+  padding: 18,
+  marginBottom: 16,
+},
+
+row: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+},
+
+badge: {
+  backgroundColor: '#f4c542',
+  color: '#0c1b2a',
+  paddingHorizontal: 10,
+  paddingVertical: 4,
+  borderRadius: 999,
+  fontWeight: 'bold',
+},
+
+restaurantName: {
+  color: '#fff',
+  fontSize: 20,
+  fontWeight: 'bold',
+  marginTop: 10,
+},
+
+hours: {
+  color: '#7fd1ff',
+  marginTop: 6,
+  fontWeight: '600',
+},
+
+description: {
+  color: '#ddd',
+  marginTop: 8,
+  lineHeight: 20,
+},
+
+actionButton: {
+  marginTop: 12,
+  backgroundColor: '#1f6f8b',
+  padding: 10,
+  borderRadius: 8,
+},
+
+actionText: {
+  color: '#fff',
+  textAlign: 'center',
+  fontWeight: 'bold',
+},
 });
