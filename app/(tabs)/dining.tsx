@@ -1,5 +1,5 @@
 import { ScrollView, Text, View, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { Ionicons } from "@expo/vector-icons";
+import { colors } from '../theme/colors';
 
 const restaurants = [
   {
@@ -67,59 +67,37 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#0c1b2a',
-  },
-  title: {
-    color: '#fff',
-    fontSize: 32,
-    fontWeight: 'bold',
-  },
-  subtitle: {
-    color: '#b8c7d9',
-    marginTop: 8,
-    marginBottom: 20,
-    fontSize: 16,
-  },
-  card: {
-    backgroundColor: '#13293d',
-    borderRadius: 16,
-    padding: 18,
-    marginBottom: 16,
+    backgroundColor: colors.oceanDark,
   },
   badge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#f4c542',
-    color: '#0c1b2a',
+    backgroundColor: colors.sunshine,
+    color: colors.oceanDark,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
     fontWeight: 'bold',
     marginBottom: 10,
   },
-  name: {
-    color: '#fff',
-    fontSize: 22,
-    fontWeight: 'bold',
-  },
   hours: {
-    color: '#7fd1ff',
+    color: colors.seafoam,
     marginTop: 6,
     fontWeight: '600',
   },
   description: {
-    color: '#ddd',
+    color: colors.mutedText,
     marginTop: 8,
     lineHeight: 20,
   },
   hero: {
-    backgroundColor: '#123c4a',
+    backgroundColor: colors.ocean,
     borderRadius: 24,
     padding: 22,
     marginBottom: 20,
   },
 
   eyebrow: {
-    color: '#f4c542',
+    color: colors.sunshine,
     fontWeight: 'bold',
     marginBottom: 8,
     textTransform: 'uppercase',
@@ -127,18 +105,18 @@ const styles = StyleSheet.create({
   },
 
   heroTitle: {
-    color: '#fff',
+    color: colors.text,
     fontSize: 30,
     fontWeight: 'bold',
   },
 
   heroSubtitle: {
-    color: '#b8c7d9',
+    color: colors.mutedText,
     fontSize: 16,
     marginTop: 6,
   },
   restaurantCard: {
-  backgroundColor: '#13293d',
+  backgroundColor: colors.card,
   borderRadius: 16,
   padding: 18,
   marginBottom: 16,
@@ -149,43 +127,22 @@ row: {
   justifyContent: 'space-between',
 },
 
-badge: {
-  backgroundColor: '#f4c542',
-  color: '#0c1b2a',
-  paddingHorizontal: 10,
-  paddingVertical: 4,
-  borderRadius: 999,
-  fontWeight: 'bold',
-},
-
 restaurantName: {
-  color: '#fff',
+  color: colors.text,
   fontSize: 20,
   fontWeight: 'bold',
   marginTop: 10,
 },
 
-hours: {
-  color: '#7fd1ff',
-  marginTop: 6,
-  fontWeight: '600',
-},
-
-description: {
-  color: '#ddd',
-  marginTop: 8,
-  lineHeight: 20,
-},
-
 actionButton: {
   marginTop: 12,
-  backgroundColor: '#1f6f8b',
+  backgroundColor: colors.lagoon,
   padding: 10,
   borderRadius: 8,
 },
 
 actionText: {
-  color: '#fff',
+  color: colors.text,
   textAlign: 'center',
   fontWeight: 'bold',
 },
