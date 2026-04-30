@@ -1,5 +1,6 @@
-import { ScrollView, Text, View, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { ScrollView, Text, View, StyleSheet, TouchableOpacity, Image, } from 'react-native';
 import { colors } from '../theme/colors';
+import { useState } from 'react';
 
 const restaurants = [
   {
@@ -30,7 +31,11 @@ const restaurants = [
   },
 ];
 
+
+
 export default function DiningScreen() {
+  const [selectedRestaurant, setSelectedRestaurant] = useState<any>(null);
+  
   return (
     <ScrollView style={styles.container}>
      <View style={styles.hero}>
@@ -39,8 +44,8 @@ export default function DiningScreen() {
         <Text style={styles.heroSubtitle}>
             Discover included dining, specialty restaurants, and late-night bites.
         </Text>
-    </View>
-    {restaurants.map((restaurant) => (
+     </View>
+        {restaurants.map((restaurant) => (
         <View key={restaurant.name} style={styles.restaurantCard}>
             <Image 
             source={{ uri: restaurant.image }} 
@@ -54,11 +59,23 @@ export default function DiningScreen() {
             <Text style={styles.hours}>{restaurant.hours}</Text>
             <Text style={styles.description}>{restaurant.description}</Text>
 
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity style={styles.actionButton} onPress={() => setSelectedRestaurant(restaurant)}>
             <Text style={styles.actionText}>View Menu</Text>
             </TouchableOpacity>
         </View>
         ))}
+        {selectedRestaurant && (
+            <View style={styles.overlay}>
+                <View style={styles.modal}>
+                    <Text style={styles.modalTitle}>{selectedRestaurant.name}</Text>
+                    <Text style={styles.modalText}>{selectedRestaurant.description}</Text>
+
+                    <TouchableOpacity onPress={() => setSelectedRestaurant(null)}>
+                        <Text style={styles.closeText}>Close</Text>
+                    </TouchableOpacity>
+        </View>
+    </View>
+        )}
     </ScrollView>
   );
 }
@@ -152,5 +169,42 @@ restaurantImage: {
   height: 140,
   borderRadius: 14,
   marginBottom: 12,
+},
+
+modal: {
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  right: 0,
+  backgroundColor: colors.card,
+  padding: 20,
+  borderTopLeftRadius: 20,
+  borderTopRightRadius: 20,
+},
+
+modalTitle: {
+  color: colors.text,
+  fontSize: 20,
+  fontWeight: 'bold',
+},
+
+modalText: {
+  color: colors.mutedText,
+  marginTop: 10,
+},
+
+closeText: {
+  color: colors.coral,
+  marginTop: 15,
+  textAlign: 'center',
+},
+overlay: {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: 'rgba(0,0,0,0.6)',
+  justifyContent: 'flex-end',
 },
 });
