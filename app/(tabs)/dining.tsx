@@ -1,6 +1,14 @@
-import { ScrollView, Text, View, StyleSheet, TouchableOpacity, Image, } from 'react-native';
+import { 
+  ScrollView, 
+  Text, 
+  View, 
+  StyleSheet, 
+  TouchableOpacity, 
+  Image,
+  Animated, 
+} from 'react-native';
 import { colors } from '../theme/colors';
-import { useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 const restaurants = [
   {
@@ -35,7 +43,20 @@ const restaurants = [
 
 export default function DiningScreen() {
   const [selectedRestaurant, setSelectedRestaurant] = useState<any>(null);
-  
+  const slideAnim = useRef(new Animated.Value(300)).current;
+
+  useEffect(() => {
+    if (selectedRestaurant) {
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      slideAnim.setValue(300);
+    }
+  }, [selectedRestaurant]);
+
   return (
     <ScrollView style={styles.container}>
      <View style={styles.hero}>
@@ -65,19 +86,25 @@ export default function DiningScreen() {
         </View>
         ))}
         {selectedRestaurant && (
-            <View style={styles.overlay}>
-                <View style={styles.modal}>
-                    <Text style={styles.modalTitle}>{selectedRestaurant.name}</Text>
-                    <Text style={styles.modalText}>{selectedRestaurant.description}</Text>
+          <View style={styles.overlay}>
+            <Animated.View
+              style={[
+                styles.modal,
+                {
+                  transform: [{ translateY: slideAnim }],
+                },
+              ]}
+            >
+              <Text style={styles.modalTitle}>{selectedRestaurant.name}</Text>
+              <Text style={styles.modalText}>{selectedRestaurant.description}</Text>
 
-                    <TouchableOpacity onPress={() => setSelectedRestaurant(null)}>
-                        <Text style={styles.closeText}>Close</Text>
-                    </TouchableOpacity>
-        </View>
-    </View>
-        )}
-    </ScrollView>
-  );
+              <TouchableOpacity onPress={() => setSelectedRestaurant(null)}>
+                <Text style={styles.closeText}>Close</Text>
+              </TouchableOpacity>
+            </Animated.View>
+          </View>)}
+        </ScrollView>
+            )
 }
 
 const styles = StyleSheet.create({
