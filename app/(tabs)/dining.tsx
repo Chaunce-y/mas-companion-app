@@ -67,7 +67,11 @@ export default function DiningScreen() {
         </Text>
      </View>
         {restaurants.map((restaurant) => (
-        <View key={restaurant.name} style={styles.restaurantCard}>
+        <TouchableOpacity
+          key={restaurant.name}
+          style={styles.restaurantCard}
+          onPress={() => setSelectedRestaurant(restaurant)}
+        >
             <Image 
             source={{ uri: restaurant.image }} 
             style={styles.restaurantImage} 
@@ -83,7 +87,7 @@ export default function DiningScreen() {
             <TouchableOpacity style={styles.actionButton} onPress={() => setSelectedRestaurant(restaurant)}>
             <Text style={styles.actionText}>View Menu</Text>
             </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
         ))}
         {selectedRestaurant && (
           <View style={styles.overlay}>
