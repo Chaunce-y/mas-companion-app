@@ -1,52 +1,31 @@
-import { 
-  ScrollView, 
-  Text, 
-  View, 
-  StyleSheet, 
-  TouchableOpacity, 
-  Image,
-  Animated, 
+import { useMemo, useRef, useState, useEffect } from 'react';
+import { useRouter } from 'expo-router';
+import {
+  Animated,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { colors } from '../theme/colors';
-import { useRef, useState, useEffect } from 'react';
 
-const restaurants = [
-  {
-    id: 'fins',
-    name: 'Fins Dining Room',
-    type: 'Included Dining',
-    hours: '5:30 PM – 9:30 PM',
-    description: 'Main dining room with island-inspired dinner service.',
-    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5',
-  },
-
-  {
-    id: 'frank-lolas',
-    name: "Frank & Lola's Pizzeria",
-    type: 'Casual Dining',
-    hours: '11:00 AM – 11:00 PM',
-    description: 'Pizza, quick bites, and late-night comfort food.',
-    image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591',
-  },
-
-  {
-    id: 'jwb',
-    name: 'JWB Prime Steakhouse',
-    type: 'Specialty Dining',
-    hours: '6:00 PM – 10:00 PM',
-    description: 'Upscale specialty steakhouse with prime steaks, seafood, and casual elegance.',
-    image: 'https://images.unsplash.com/photo-1544025162-d76694265947',
-  },
-];
-
-
+import { DiningCard } from '@/components/DiningCard';
+import { DiningVenue, diningVenues } from '@/data/dining';
+import { colors } from '@/theme/colors';
+import {
+  getAvailableNow,
+  getDiningStatus,
+  sortDiningByAvailability,
+} from '@/utils/dining';
 
 export default function DiningScreen() {
-  const [selectedRestaurant, setSelectedRestaurant] = useState<any>(null);
+  const router = useRouter();
+  const [selectedVenue, setSelectedVenue] = useState<DiningVenue | null>(null);
+  const [currentTime] = useState(new Date());
   const slideAnim = useRef(new Animated.Value(300)).current;
 
   useEffect(() => {
-    if (selectedRestaurant) {
+    if (selectedVenue) {
       Animated.timing(slideAnim, {
         toValue: 0,
         duration: 250,
@@ -55,187 +34,168 @@ export default function DiningScreen() {
     } else {
       slideAnim.setValue(300);
     }
-  }, [selectedRestaurant]);
+  }, [selectedVenue, slideAnim]);
+
+  const availableNow = useMemo(
+    () => getAvailableNow(diningVenues, currentTime),
+    [currentTime]
+  );
+  const sortedVenues = useMemo(
+    () => sortDiningByAvailability(diningVenues, currentTime),
+    [currentTime]
+  );
 
   return (
-    <ScrollView style={styles.container}>
-     <View style={styles.hero}>
-        <Text style={styles.eyebrow}>Onboard Dining</Text>
-        <Text style={styles.heroTitle}>Eat, drink, and cruise easy</Text>
-        <Text style={styles.heroSubtitle}>
+    <View style={styles.screen}>
+      <ScrollView style={styles.container}>
+        <View style={styles.hero}>
+          <Text style={styles.eyebrow}>Onboard Dining</Text>
+          <Text style={styles.heroTitle}>Eat, drink, and cruise easy</Text>
+          <Text style={styles.heroSubtitle}>
             Discover included dining, specialty restaurants, and late-night bites.
-        </Text>
-     </View>
-        {restaurants.map((restaurant) => (
-        <TouchableOpacity
-          key={restaurant.name}
-          style={styles.restaurantCard}
-          onPress={() => setSelectedRestaurant(restaurant)}
-        >
-            <Image 
-            source={{ uri: restaurant.image }} 
-            style={styles.restaurantImage} 
+          </Text>
+        </View>
+
+        <Text style={styles.sectionTitle}>Available Now</Text>
+        {availableNow.length === 0 ? (
+          <View style={styles.emptyCard}>
+            <Text style={styles.emptyText}>No dining venues are open right now.</Text>
+          </View>
+        ) : (
+          availableNow.map((venue) => (
+            <DiningCard
+              key={`available-${venue.id}`}
+              venue={venue}
+              status={getDiningStatus(venue, currentTime)}
+              onViewMenu={setSelectedVenue}
+              onPressLocation={(locationId) =>
+                router.push({ pathname: '/ship-map', params: { locationId } })
+              }
             />
-            <View style={styles.row}>
-            <Text style={styles.badge}>{restaurant.type}</Text>
-            </View>
+          ))
+        )}
 
-            <Text style={styles.restaurantName}>{restaurant.name}</Text>
-            <Text style={styles.hours}>{restaurant.hours}</Text>
-            <Text style={styles.description}>{restaurant.description}</Text>
-
-            <TouchableOpacity style={styles.actionButton} onPress={() => setSelectedRestaurant(restaurant)}>
-            <Text style={styles.actionText}>View Menu</Text>
-            </TouchableOpacity>
-        </TouchableOpacity>
+        <Text style={styles.sectionTitle}>All Dining</Text>
+        {sortedVenues.map((venue) => (
+          <DiningCard
+            key={venue.id}
+            venue={venue}
+            status={getDiningStatus(venue, currentTime)}
+            onViewMenu={setSelectedVenue}
+            onPressLocation={(locationId) =>
+              router.push({ pathname: '/ship-map', params: { locationId } })
+            }
+          />
         ))}
-        {selectedRestaurant && (
-          <View style={styles.overlay}>
-            <Animated.View
-              style={[
-                styles.modal,
-                {
-                  transform: [{ translateY: slideAnim }],
-                },
-              ]}
-            >
-              <Text style={styles.modalTitle}>{selectedRestaurant.name}</Text>
-              <Text style={styles.modalText}>{selectedRestaurant.description}</Text>
+      </ScrollView>
 
-              <TouchableOpacity onPress={() => setSelectedRestaurant(null)}>
-                <Text style={styles.closeText}>Close</Text>
-              </TouchableOpacity>
-            </Animated.View>
-          </View>)}
-        </ScrollView>
-            )
+      {selectedVenue ? (
+        <View style={styles.overlay}>
+          <Animated.View
+            style={[
+              styles.modal,
+              {
+                transform: [{ translateY: slideAnim }],
+              },
+            ]}
+          >
+            <Text style={styles.modalTitle}>{selectedVenue.name}</Text>
+            <Text style={styles.modalText}>{selectedVenue.description}</Text>
+            <Text style={styles.modalLocation}>{selectedVenue.locationName}</Text>
+
+            <TouchableOpacity onPress={() => setSelectedVenue(null)}>
+              <Text style={styles.closeText}>Close</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
+      ) : null}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    backgroundColor: colors.oceanDark,
+    flex: 1,
+  },
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: colors.oceanDark,
-  },
-  badge: {
-    alignSelf: 'flex-start',
-    backgroundColor: colors.sunshine,
-    color: colors.oceanDark,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 999,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  hours: {
-    color: colors.seafoam,
-    marginTop: 6,
-    fontWeight: '600',
-  },
-  description: {
-    color: colors.mutedText,
-    marginTop: 8,
-    lineHeight: 20,
   },
   hero: {
     backgroundColor: colors.ocean,
     borderRadius: 24,
-    padding: 22,
     marginBottom: 20,
+    padding: 22,
   },
-
   eyebrow: {
     color: colors.sunshine,
     fontWeight: 'bold',
+    letterSpacing: 1,
     marginBottom: 8,
     textTransform: 'uppercase',
-    letterSpacing: 1,
   },
-
   heroTitle: {
     color: colors.text,
     fontSize: 30,
     fontWeight: 'bold',
   },
-
   heroSubtitle: {
     color: colors.mutedText,
     fontSize: 16,
     marginTop: 6,
   },
-  restaurantCard: {
-  backgroundColor: colors.card,
-  borderRadius: 16,
-  padding: 18,
-  marginBottom: 16,
-},
-
-row: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-},
-
-restaurantName: {
-  color: colors.text,
-  fontSize: 20,
-  fontWeight: 'bold',
-  marginTop: 10,
-},
-
-actionButton: {
-  marginTop: 12,
-  backgroundColor: colors.lagoon,
-  padding: 10,
-  borderRadius: 8,
-},
-
-actionText: {
-  color: colors.text,
-  textAlign: 'center',
-  fontWeight: 'bold',
-},
-
-restaurantImage: {
-  width: '100%',
-  height: 140,
-  borderRadius: 14,
-  marginBottom: 12,
-},
-
-modal: {
-  position: 'absolute',
-  bottom: 0,
-  left: 0,
-  right: 0,
-  backgroundColor: colors.card,
-  padding: 20,
-  borderTopLeftRadius: 20,
-  borderTopRightRadius: 20,
-},
-
-modalTitle: {
-  color: colors.text,
-  fontSize: 20,
-  fontWeight: 'bold',
-},
-
-modalText: {
-  color: colors.mutedText,
-  marginTop: 10,
-},
-
-closeText: {
-  color: colors.coral,
-  marginTop: 15,
-  textAlign: 'center',
-},
-overlay: {
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  backgroundColor: 'rgba(0,0,0,0.6)',
-  justifyContent: 'flex-end',
-},
+  sectionTitle: {
+    color: colors.text,
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 12,
+  },
+  emptyCard: {
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    marginBottom: 16,
+    padding: 18,
+  },
+  emptyText: {
+    color: colors.mutedText,
+  },
+  overlay: {
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    bottom: 0,
+    justifyContent: 'flex-end',
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
+  modal: {
+    backgroundColor: colors.card,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    bottom: 0,
+    left: 0,
+    padding: 20,
+    position: 'absolute',
+    right: 0,
+  },
+  modalTitle: {
+    color: colors.text,
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  modalText: {
+    color: colors.mutedText,
+    marginTop: 10,
+  },
+  modalLocation: {
+    color: colors.seafoam,
+    fontWeight: '600',
+    marginTop: 10,
+  },
+  closeText: {
+    color: colors.coral,
+    marginTop: 15,
+    textAlign: 'center',
+  },
 });
