@@ -30,7 +30,7 @@ export default function ScheduleScreen() {
 
   const sortedEvents = useMemo(() => sortEventsByStartTime(events), []);
   const nextEventIds = useMemo(
-    () => getNextEvents(events, currentTime).map((event) => event.id),
+    () => getNextEvents(events, currentTime).slice(0, 1).map((event) => event.id),
     [currentTime]
   );
 

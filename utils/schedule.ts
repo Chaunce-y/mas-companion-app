@@ -70,7 +70,7 @@ export function getEventStatusLabel(status: EventStatus): string {
     case 'next':
       return 'NEXT UP';
     case 'past':
-      return 'PAST';
+      return 'ENDED';
     case 'upcoming':
     default:
       return 'UPCOMING';

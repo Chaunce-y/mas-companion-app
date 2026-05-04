@@ -13,12 +13,15 @@ export type BadgeVariant =
 type BadgeProps = {
   label: string;
   variant?: BadgeVariant;
+  size?: 'default' | 'large';
 };
 
-export function Badge({ label, variant = 'default' }: BadgeProps) {
+export function Badge({ label, variant = 'default', size = 'default' }: BadgeProps) {
   return (
-    <View style={[styles.badge, getBadgeStyle(variant)]}>
-      <Text style={[styles.text, getTextStyle(variant)]}>{label}</Text>
+    <View style={[styles.badge, size === 'large' && styles.largeBadge, getBadgeStyle(variant)]}>
+      <Text style={[styles.text, size === 'large' && styles.largeText, getTextStyle(variant)]}>
+        {label}
+      </Text>
     </View>
   );
 }
@@ -65,6 +68,13 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 12,
     fontWeight: 'bold',
+  },
+  largeBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+  },
+  largeText: {
+    fontSize: 13,
   },
   defaultBadge: {
     backgroundColor: colors.sunshine,

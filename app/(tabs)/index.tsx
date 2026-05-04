@@ -49,7 +49,7 @@ export default function HomeScreen() {
     [currentTime]
   );
   const nextEventIds = useMemo(
-    () => nextEvents.map((event) => event.id),
+    () => nextEvents.slice(0, 1).map((event) => event.id),
     [nextEvents]
   );
   const planEvents = useMemo(

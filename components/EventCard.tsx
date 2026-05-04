@@ -25,20 +25,35 @@ export function EventCard({
   compact = false,
   onPressLocation,
 }: EventCardProps) {
+  const isPast = status === 'past';
+  const isLive = status === 'live';
+
   return (
-    <SectionCard>
+    <SectionCard style={[isLive && styles.liveCard, isPast && styles.pastCard]}>
       <View style={styles.headerRow}>
-        <Badge label={getEventStatusLabel(status)} variant={getStatusVariant(status)} />
+        <Badge
+          label={getEventStatusLabel(status)}
+          variant={getStatusVariant(status)}
+          size={isLive ? 'large' : 'default'}
+        />
         <View style={styles.timeRow}>
-          <Ionicons name="time" size={16} color={colors.seafoam} />
-          <Text style={styles.time}>{formatTimeRange(event.startTime, event.endTime)}</Text>
+          <Ionicons
+            name="time"
+            size={16}
+            color={isPast ? colors.mutedText : colors.seafoam}
+          />
+          <Text style={[styles.time, isPast && styles.mutedText]}>
+            {formatTimeRange(event.startTime, event.endTime)}
+          </Text>
         </View>
       </View>
 
-      <Text style={styles.title}>{event.title}</Text>
+      <Text style={[styles.title, isPast && styles.pastTitle]}>{event.title}</Text>
 
       {!compact && event.description ? (
-        <Text style={styles.description}>{event.description}</Text>
+        <Text style={[styles.description, isPast && styles.mutedText]}>
+          {event.description}
+        </Text>
       ) : null}
 
       <TouchableOpacity
@@ -46,8 +61,14 @@ export function EventCard({
         onPress={() => onPressLocation?.(event.locationId)}
         style={styles.locationRow}
       >
-        <Ionicons name="location" size={16} color={colors.seafoam} />
-        <Text style={styles.location}>{event.locationName}</Text>
+        <Ionicons
+          name="location"
+          size={16}
+          color={isPast ? colors.mutedText : colors.seafoam}
+        />
+        <Text style={[styles.location, isPast && styles.mutedText]}>
+          {event.locationName}
+        </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -83,6 +104,13 @@ const styles = StyleSheet.create({
     gap: 10,
     justifyContent: 'space-between',
   },
+  liveCard: {
+    borderColor: colors.coral,
+    borderWidth: 1,
+  },
+  pastCard: {
+    opacity: 0.55,
+  },
   timeRow: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -100,6 +128,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginTop: 12,
+  },
+  pastTitle: {
+    color: colors.mutedText,
+  },
+  mutedText: {
+    color: colors.mutedText,
   },
   description: {
     color: colors.mutedText,

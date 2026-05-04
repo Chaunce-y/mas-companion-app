@@ -1,13 +1,14 @@
 import { PropsWithChildren } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 
 type SectionCardProps = PropsWithChildren<{
   tone?: 'solid' | 'glass';
+  style?: StyleProp<ViewStyle>;
 }>;
 
-export function SectionCard({ children, tone = 'solid' }: SectionCardProps) {
+export function SectionCard({ children, tone = 'solid', style }: SectionCardProps) {
   return (
-    <View style={[styles.card, tone === 'glass' && styles.glassCard]}>
+    <View style={[styles.card, tone === 'glass' && styles.glassCard, style]}>
       {children}
     </View>
   );
