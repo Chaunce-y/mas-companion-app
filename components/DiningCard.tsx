@@ -8,6 +8,7 @@ import { colors } from '@/theme/colors';
 import {
   DiningStatus,
   getDiningCostLabel,
+  getDiningStatusHelperText,
   getDiningStatusLabel,
 } from '@/utils/dining';
 import { formatTimeRange } from '@/utils/time';
@@ -26,17 +27,23 @@ export function DiningCard({
   onPressLocation,
 }: DiningCardProps) {
   return (
-    <SectionCard>
+    <SectionCard tone="glass">
       <Image source={{ uri: venue.image }} style={styles.image} />
 
       <View style={styles.badgeRow}>
-        <Badge label={getDiningStatusLabel(venue, status)} variant={getStatusVariant(status)} />
-        <Badge label={getDiningCostLabel(venue)} variant={venue.included ? 'success' : 'warning'} />
+        <Badge label={getDiningStatusLabel(status)} variant={getStatusVariant(status)} />
+        <Badge
+          label={getDiningCostLabel(venue)}
+          variant={getCostVariant(venue.category)}
+        />
       </View>
 
       <Text style={styles.name}>{venue.name}</Text>
       <Text style={styles.category}>{venue.categoryLabel}</Text>
       <Text style={styles.hours}>{formatTimeRange(venue.openTime, venue.closeTime)}</Text>
+      <Text style={[styles.statusHelper, status === 'closed' && styles.mutedHelper]}>
+        {getDiningStatusHelperText(venue, status)}
+      </Text>
       <Text style={styles.description}>{venue.description}</Text>
 
       <TouchableOpacity
@@ -68,6 +75,18 @@ function getStatusVariant(status: DiningStatus): BadgeVariant {
   }
 }
 
+function getCostVariant(category: DiningVenue['category']): BadgeVariant {
+  if (category === 'specialty') {
+    return 'warning';
+  }
+
+  if (category === 'casual') {
+    return 'info';
+  }
+
+  return 'success';
+}
+
 const styles = StyleSheet.create({
   image: {
     borderRadius: 14,
@@ -94,6 +113,14 @@ const styles = StyleSheet.create({
     color: colors.seafoam,
     fontWeight: '600',
     marginTop: 6,
+  },
+  statusHelper: {
+    color: colors.sunshine,
+    fontWeight: '700',
+    marginTop: 6,
+  },
+  mutedHelper: {
+    color: colors.mutedText,
   },
   description: {
     color: colors.mutedText,
