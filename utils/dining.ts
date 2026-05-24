@@ -30,14 +30,13 @@ export function getDiningStatus(
 }
 
 export function getDiningStatusLabel(
-  venue: DiningVenue,
   status: DiningStatus
 ): string {
   switch (status) {
     case 'open':
       return 'OPEN NOW';
     case 'openingSoon':
-      return `OPENS AT ${formatTime(venue.openTime)}`;
+      return 'OPENS SOON';
     case 'closingSoon':
       return 'CLOSING SOON';
     case 'closed':
@@ -46,12 +45,37 @@ export function getDiningStatusLabel(
   }
 }
 
+export function getDiningStatusHelperText(
+  venue: DiningVenue,
+  status: DiningStatus
+): string {
+  switch (status) {
+    case 'open':
+      return `Closes at ${formatTime(venue.closeTime)}`;
+    case 'openingSoon':
+      return `Opens at ${formatTime(venue.openTime)}`;
+    case 'closingSoon':
+      return 'Closes soon';
+    case 'closed':
+    default:
+      return `Opens at ${formatTime(venue.openTime)}`;
+  }
+}
+
 export function getDiningCostLabel(venue: DiningVenue): string {
-  if (!venue.included) {
-    return 'EXTRA COST';
+  if (venue.included) {
+    return venue.category === 'casual' ? 'QUICK BITE' : 'INCLUDED';
   }
 
-  return venue.category === 'casual' ? 'QUICK BITE' : 'INCLUDED';
+  if (venue.category === 'premium') {
+    return 'PREMIUM';
+  }
+
+  if (venue.category === 'specialty') {
+    return 'SPECIALTY';
+  }
+
+  return 'À LA CARTE';
 }
 
 export function getAvailableNow(
