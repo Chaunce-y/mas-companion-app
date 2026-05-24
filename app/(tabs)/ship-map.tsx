@@ -4,8 +4,10 @@ import { useLocalSearchParams } from 'expo-router';
 
 import { Badge } from '@/components/Badge';
 import { SectionCard } from '@/components/SectionCard';
-import { locations } from '@/data/locations';
+import { locations, ShipLocation } from '@/data/locations';
 import { colors } from '@/theme/colors';
+
+const ALL_DECKS = 'All Decks';
 
 export default function ShipMapScreen() {
   const { locationId } = useLocalSearchParams<{ locationId?: string }>();
@@ -19,42 +21,104 @@ export default function ShipMapScreen() {
       locations.find((location) => location.id === selectedLocationId) ?? locations[0],
     [selectedLocationId]
   );
+  const [selectedDeck, setSelectedDeck] = useState(selectedLocation?.deck ?? ALL_DECKS);
+
+  const decks = useMemo(
+    () => [ALL_DECKS, ...Array.from(new Set(locations.map((location) => location.deck)))],
+    []
+  );
+  const visibleLocations = useMemo(
+    () =>
+      selectedDeck === ALL_DECKS
+        ? locations
+        : locations.filter((location) => location.deck === selectedDeck),
+    [selectedDeck]
+  );
+  const sameDeckLocations = useMemo(
+    () =>
+      selectedLocation
+        ? locations.filter(
+            (location) =>
+              location.deck === selectedLocation.deck && location.id !== selectedLocation.id
+          )
+        : [],
+    [selectedLocation]
+  );
+
+  const handleSelectLocation = (location: ShipLocation) => {
+    setSelectedLocationId(location.id);
+    setSelectedDeck(location.deck);
+  };
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Location Viewer</Text>
-      <Text style={styles.subtitle}>Quick deck and area references for your plan.</Text>
+      <Text style={styles.title}>Deck Guide</Text>
+      <Text style={styles.subtitle}>Find dining, events, lounges, and day-one essentials by deck.</Text>
 
       {selectedLocation ? (
-        <SectionCard>
+        <SectionCard style={styles.focusCard}>
           <View style={styles.focusHeader}>
             <Badge label={selectedLocation.deck} variant="success" />
             <Badge label={selectedLocation.area} variant="info" />
           </View>
+          <Text style={styles.focusLabel}>Currently focused</Text>
           <Text style={styles.focusName}>{selectedLocation.name}</Text>
           {selectedLocation.description ? (
             <Text style={styles.description}>{selectedLocation.description}</Text>
           ) : null}
+
+          {sameDeckLocations.length > 0 ? (
+            <View style={styles.nearbyPanel}>
+              <Text style={styles.nearbyTitle}>Also on {selectedLocation.deck}</Text>
+              <Text style={styles.nearbyText}>
+                {sameDeckLocations.slice(0, 3).map((location) => location.name).join(' • ')}
+              </Text>
+            </View>
+          ) : null}
         </SectionCard>
       ) : null}
 
-      <Text style={styles.sectionTitle}>All Locations</Text>
-      {locations.map((location) => {
+      <Text style={styles.sectionTitle}>Filter by Deck</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.deckScroller}>
+        {decks.map((deck) => {
+          const isSelected = deck === selectedDeck;
+
+          return (
+            <TouchableOpacity
+              key={deck}
+              style={[styles.deckChip, isSelected && styles.selectedDeckChip]}
+              onPress={() => setSelectedDeck(deck)}
+            >
+              <Text style={[styles.deckChipText, isSelected && styles.selectedDeckChipText]}>
+                {deck}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+
+      <Text style={styles.sectionTitle}>Locations</Text>
+      {visibleLocations.map((location) => {
         const isSelected = location.id === selectedLocation?.id;
 
         return (
           <TouchableOpacity
             key={location.id}
-            style={[styles.locationRow, isSelected && styles.selectedLocationRow]}
-            onPress={() => setSelectedLocationId(location.id)}
+            style={[styles.locationCard, isSelected && styles.selectedLocationCard]}
+            onPress={() => handleSelectLocation(location)}
           >
-            <View style={styles.locationTextGroup}>
-              <Text style={styles.locationName}>{location.name}</Text>
-              <Text style={styles.locationMeta}>
-                {location.deck} • {location.area}
-              </Text>
+            <View style={styles.locationTopRow}>
+              <View style={styles.locationTextGroup}>
+                <Text style={styles.locationName}>{location.name}</Text>
+                <Text style={styles.locationMeta}>
+                  {location.deck} • {location.area}
+                </Text>
+              </View>
+              {isSelected ? <Text style={styles.selectedText}>Focused</Text> : null}
             </View>
-            {isSelected ? <Text style={styles.selectedText}>Focused</Text> : null}
+            {location.description ? (
+              <Text style={styles.locationDescription}>{location.description}</Text>
+            ) : null}
           </TouchableOpacity>
         );
       })}
@@ -75,24 +139,52 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     color: colors.mutedText,
+    lineHeight: 20,
     marginBottom: 20,
     marginTop: 8,
+  },
+  focusCard: {
+    borderColor: 'rgba(127, 209, 255, 0.28)',
+    borderWidth: 1,
   },
   focusHeader: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
   },
+  focusLabel: {
+    color: colors.sunshine,
+    fontSize: 12,
+    fontWeight: 'bold',
+    letterSpacing: 1,
+    marginTop: 16,
+    textTransform: 'uppercase',
+  },
   focusName: {
     color: colors.text,
     fontSize: 24,
     fontWeight: 'bold',
-    marginTop: 14,
+    marginTop: 6,
   },
   description: {
     color: colors.mutedText,
     lineHeight: 20,
     marginTop: 8,
+  },
+  nearbyPanel: {
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 14,
+    marginTop: 14,
+    padding: 12,
+  },
+  nearbyTitle: {
+    color: colors.text,
+    fontWeight: 'bold',
+  },
+  nearbyText: {
+    color: colors.mutedText,
+    lineHeight: 20,
+    marginTop: 4,
   },
   sectionTitle: {
     color: colors.text,
@@ -100,18 +192,45 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 12,
   },
-  locationRow: {
-    alignItems: 'center',
+  deckScroller: {
+    marginBottom: 18,
+  },
+  deckChip: {
     backgroundColor: colors.card,
-    borderRadius: 14,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    borderColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 999,
+    borderWidth: 1,
+    marginRight: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+  },
+  selectedDeckChip: {
+    backgroundColor: colors.seafoam,
+  },
+  deckChipText: {
+    color: colors.text,
+    fontWeight: 'bold',
+  },
+  selectedDeckChipText: {
+    color: colors.oceanDark,
+  },
+  locationCard: {
+    backgroundColor: colors.card,
+    borderColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 16,
+    borderWidth: 1,
     marginBottom: 12,
     padding: 16,
   },
-  selectedLocationRow: {
+  selectedLocationCard: {
     borderColor: colors.seafoam,
-    borderWidth: 1,
+    borderWidth: 2,
+  },
+  locationTopRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 12,
+    justifyContent: 'space-between',
   },
   locationTextGroup: {
     flex: 1,
@@ -123,8 +242,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   locationMeta: {
-    color: colors.mutedText,
+    color: colors.seafoam,
+    fontWeight: '600',
     marginTop: 4,
+  },
+  locationDescription: {
+    color: colors.mutedText,
+    lineHeight: 20,
+    marginTop: 8,
   },
   selectedText: {
     color: colors.seafoam,
